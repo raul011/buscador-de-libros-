@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Libros</title>
+    <!-- CSS enlazado -->
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="logo">
+            <h1>Buscador de libros</h1>
+        </div>
+        <nav class="main-nav">
+            <ul>
+                <li><a href="#">Inicio</a></li>
+                <li><a href="#">Categorías</a></li>
+                <li><a href="#">Novedades</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- seccion principal de busqueda -->
+        <section class="hero-section">
+            <div class="contenido-banner">
+                <h2>Encuentra el libro que mas te guste</h2>
+                <p>Explora miles de títulos, autores y géneros en un solo lugar.</p>
+                <div class="search-bar">
+                    <input type="text" placeholder="Buscar por título, autor ...">
+                    <button>Buscar</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="books-section">
+            <h3 class="titulo-seccion">Libros Destacados</h3>
+
+            <!-- contenedor de las tarjetas -->
+            <div class="books-grid">
+
+                <!-- Tarjeta 1 -->
+                <article class="book-card">
+                    <img src="imagenes/steve_jobs.jpg" alt="Portada de Steve Jobs">
+                    <div class="book-info">
+                        <div class="datos-extra">
+                            <span class="categoria">Biografía</span>
+                            <span class="anio-pub">2011</span>
+                        </div>
+                        <h4 title="Steve Jobs">Steve Jobs</h4>
+                        <p class="nombre-autor">Walter Isaacson</p>
+                        <p class="resumen">La biografía exclusiva de Steve Jobs, el creador de Apple, basada en más de
+                            cuarenta entrevistas realizadas al propio Jobs.</p>
+
+                        <div class="book-footer">
+                            <span class="codigo-isbn">ISBN: 978-1451648539</span>
+                            <a href="#" class="boton-detalles">Detalles</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Tarjeta 2 -->
+                <article class="book-card">
+                    <img src="imagenes/mente_millonaria.jpg" alt="Portada Secretos de la Mente Millonaria">
+                    <div class="book-info">
+                        <div class="datos-extra">
+                            <span class="categoria">Finanzas</span>
+                            <span class="anio-pub">2005</span>
+                        </div>
+                        <h4 title="Secretos de la Mente Millonaria">Secretos de la Mente Millonaria</h4>
+                        <p class="nombre-autor">T. Harv Eker</p>
+                        <p class="resumen">Descubre el "patrón del dinero" que todos tenemos en nuestro subconsciente y
+                            cómo reprogramarlo para alcanzar el éxito financiero.</p>
+
+                        <div class="book-footer">
+                            <span class="codigo-isbn">ISBN: 978-8478086086</span>
+                            <a href="#" class="boton-detalles">Detalles</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Tarjeta 3 -->
+                <article class="book-card">
+                    <img src="imagenes/vida_extraordinaria.jpg" alt="Portada Una Vida Extraordinaria">
+                    <div class="book-info">
+                        <div class="datos-extra">
+                            <span class="categoria">Autoayuda</span>
+                            <span class="anio-pub">2020</span>
+                        </div>
+                        <h4 title="Una Vida Extraordinaria">Una Vida Extraordinaria</h4>
+                        <p class="nombre-autor">Autor Inspiracional</p>
+                        <p class="resumen">Descubre cómo transformar tu día a día en una experiencia única y alcanzar
+                            tus metas con hábitos y mentalidad positiva.</p>
+
+                        <div class="book-footer">
+                            <span class="codigo-isbn">ISBN: 978-1234567890</span>
+                            <a href="#" class="boton-detalles">Detalles</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Tarjeta 4 -->
+                <article class="book-card">
+                    <img src="imagenes/piense_y_hagase_rico.jpg" alt="Portada Piense y Hágase Rico">
+                    <div class="book-info">
+                        <div class="datos-extra">
+                            <span class="categoria">Negocios</span>
+                            <span class="anio-pub">1937</span>
+                        </div>
+                        <h4 title="Piense y Hágase Rico">Piense y Hágase Rico</h4>
+                        <p class="nombre-autor">Napoleon Hill</p>
+                        <p class="resumen">El clásico de la riqueza y el éxito personal. Conoce el secreto de los
+                            grandes millonarios para alcanzar la prosperidad.</p>
+
+                        <div class="book-footer">
+                            <span class="codigo-isbn">ISBN: 978-8497778213</span>
+                            <a href="#" class="boton-detalles">Detalles</a>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; Buscador de libros</p>
+
+    </footer>
+</body>
+
+</html>
