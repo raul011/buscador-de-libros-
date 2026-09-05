@@ -31,10 +31,11 @@
             <div class="contenido-banner">
                 <h2>Encuentra el libro que mas te guste</h2>
                 <p>Explora miles de títulos, autores y géneros en un solo lugar.</p>
-                <div class="search-bar">
-                    <input type="text" placeholder="Buscar por título, autor ...">
-                    <button>Buscar</button>
-                </div>
+                <form class="search-bar" id="search-form">
+                    <input type="text" id="search-input" placeholder="Buscar por título, autor ...">
+                    <button type="submit">Buscar</button>
+                </form>
+                <p id="search-message"></p>
             </div>
         </section>
 
@@ -131,6 +132,7 @@
         <p>&copy; Buscador de libros</p>
 
     </footer>
+    <script src="app.js"></script>
 </body>
 
 </html>
