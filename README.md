@@ -90,3 +90,13 @@ useEffect(() => {
     .catch(err => setError('no se pudo conectar'))
 }, [busqueda])
 ```
+
+---
+
+# Practica U3-2 : Convertir el GET en una Lista en Pantalla
+
+En esta practica teniamos que mostrar los datos de la API en pantalla usando React, ya no solo en la consola.
+
+Lo que hice fue meter el fetch dentro de un useEffect en App.jsx. Use tres estados: uno para guardar los libros y  otro para saber si esta cargando y otro para el error. Mientras espera que lleguen los datos muestra un spinner y si falla la peticion sale un mensaje de error.
+
+Para mostrar los libros use .map() y le pase el key que viene del id de Open Library (doc.key). Modifique App.jsx para toda la logica y en index.css agregue los estilos del spinner y el bloque de error.
