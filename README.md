@@ -1,36 +1,92 @@
-# Práctica: Diseño del BackEnd - Buscador de Libros
+# Buscador de Libros
 
-Esta es la documentación de la API para el proyecto del buscador de libros.
+Proyecto de la materia Programacion Web 1. Es un buscador de libros que consume datos de una API publica.
 
 # 1. Recurso
-La entidad principal de mi proyecto son los Libros. Todo el proyecto se trata de buscar y mostrar información sobre ellos.
+
+El recurso principal son los Libros. Todo el proyecto gira en torno a buscar y mostrar libros.
 
 # 2. Endpoints (CRUD)
-Las rutas que voy a necesitar para manejar los libros son:
 
-- **GET /api/libros** -> Para obtener la lista completa de los libros.
-- **GET /api/libros/:id** -> Para sacar la información de un solo libro específico.
-- **POST /api/libros** -> Para guardar un libro nuevo.
-- **PUT /api/libros/:id** -> Para actualizar o editar los datos de un libro (por ejemplo si me equivoqué de autor).
-- **DELETE /api/libros/:id** -> Para borrar un libro.
+Las rutas que necesito para los libros son:
+
+- **GET /api/libros** -> trae todos los libros
+- **GET /api/libros/:id** -> trae un libro por su id
+- **POST /api/libros** -> agrega un libro nuevo
+- **PUT /api/libros/:id** -> edita un libro (por ejemplo si me equivoque con el autor)
+- **DELETE /api/libros/:id** -> elimina un libro
 
 # 3. Ejemplo del JSON
-Si hago un GET a un libro, la API me devolvería algo así:
+
+Si hago un GET a un libro me devuelve algo asi:
 
 ```json
 {
   "id": 1,
   "titulo": "Steve Jobs",
   "autor": "Walter Isaacson",
-  "categoria": "Biografía",
+  "categoria": "Biografia",
   "anio": 2011,
   "isbn": "12345",
-  "resumen": "La biografía de Steve Jobs..."
+  "resumen": "La biografia de Steve Jobs..."
 }
 ```
 
 # 4. Lenguaje de BackEnd
-**Lenguaje:** Node.js (JavaScript) con Express.
 
-**Justificación:**
-Elegí hacer el backend con Node.js porque ya estamos usando JavaScript en la parte visual del proyecto para la materia. Así no me complico aprendiendo un lenguaje nuevo desde cero y puedo aprovechar lo que ya sé. Creo que es más fácil tener todo el proyecto en un solo lenguaje, además es súper rápido levantar un servidor básico con Express.
+**Lenguaje:** Node.js con Express
+
+**Por que lo elegí:**
+Lo elegi porque en la materia ya usamos JavaScript para el frontend entonces me parece lo mas logico seguir con el mismo lenguaje en el backend. Ademas con Express es bastante facil y rapido levantar un servidor, no hay que configurar mucho.
+
+---
+
+# 5. API publica usada
+
+**API:** Open Library  
+**URL:** https://openlibrary.org/search.json
+
+La use para traer los libros reales en vez de tener datos inventados. Es gratuita y no necesita clave ni registro.
+
+## Como la uso
+
+Para buscar libros mando un GET asi:
+
+```
+https://openlibrary.org/search.json?q=harry potter&limit=12
+```
+
+El `q` es el termino de busqueda y `limit` es cuantos resultados quiero.
+
+Para las portadas uso esta otra URL con el id de la portada que viene en la respuesta:
+
+```
+https://covers.openlibrary.org/b/id/8091016-M.jpg
+```
+
+## Ejemplo de lo que devuelve
+
+```json
+{
+  "key": "/works/OL45804W",
+  "title": "Clean Code",
+  "author_name": ["Robert C. Martin"],
+  "first_publish_year": 2008,
+  "cover_i": 8091016,
+  "isbn": ["9780132350884"],
+  "edition_count": 10
+}
+```
+
+## Como lo use en React
+
+En `App.jsx` hice el fetch dentro de un useEffect para que cargue los libros cuando abre la pagina:
+
+```js
+useEffect(() => {
+  fetch('https://openlibrary.org/search.json?q=programacion&limit=12')
+    .then(res => res.json())
+    .then(data => setDatos(data.docs))
+    .catch(err => setError('no se pudo conectar'))
+}, [busqueda])
+```
