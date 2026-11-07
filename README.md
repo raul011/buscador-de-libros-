@@ -100,3 +100,37 @@ En esta practica teniamos que mostrar los datos de la API en pantalla usando Rea
 Lo que hice fue meter el fetch dentro de un useEffect en App.jsx. Use tres estados: uno para guardar los libros y  otro para saber si esta cargando y otro para el error. Mientras espera que lleguen los datos muestra un spinner y si falla la peticion sale un mensaje de error.
 
 Para mostrar los libros use .map() y le pase el key que viene del id de Open Library (doc.key). Modifique App.jsx para toda la logica y en index.css agregue los estilos del spinner y el bloque de error.
+
+---
+
+# Practica de la semana: Estado compartido con Context API
+
+## Punto 1: Estado que comparten varios componentes
+
+Identifique que el estado de la busqueda lo comparten varios componentes:
+
+- **Hero** necesita el termino buscado y el mensaje de resultados.
+- **App** necesita la lista de libros, el estado de carga y el error.
+- **BookCard** necesita cada libro de la lista.
+
+Antes ese estado vivia en `App.jsx` y se pasaba a `Hero` mediante props (`onBuscar` y `mensaje`), lo que era **prop drilling**.
+
+## Punto 2: Gestion con Context API
+
+Elegi **Context API** (en vez de Redux Toolkit) porque el estado es simple y la app es chica; no hace falta instalar dependencias extra.
+
+- `src/context/librosContext.js`: crea el contexto y el hook `useLibros()`.
+- `src/context/LibrosProvider.jsx`: contiene los estados (`busqueda`, `datos`, `cargando`, `error`), el `useEffect` con el fetch y las acciones `buscar` y `reintentar`.
+- `src/main.jsx`: envuelve `<App />` con `<LibrosProvider>`.
+
+## Punto 3: Eliminar el prop drilling
+
+`Hero` ya no recibe `onBuscar` ni `mensaje` por props: ahora los obtiene con `useLibros()`. `App` tampoco pasa props y lee `datos`, `cargando`, `error` y `termino` directamente del contexto.
+
+## Punto 4: Verificar que la interfaz se actualiza
+
+Como todos los consumidores leen del mismo provider, cuando cambia `busqueda` se actualizan a la vez el mensaje del Hero, la lista de libros, el spinner y el error.
+
+## Punto 5: Decision anotada
+
+La decision fue usar Context API por ser suficiente para este tamaño de proyecto, evitando la complejidad de Redux Toolkit. Los comentarios en el codigo explican cada cambio realizado.
