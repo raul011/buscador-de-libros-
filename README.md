@@ -1,102 +1,108 @@
-# Buscador de Libros
+# Buscador de libros — Open Library API
 
-Proyecto de la materia Programacion Web 1. Es un buscador de libros que consume datos de una API publica.
+Aplicación **100% frontend** para buscar libros usando la API pública de
+[Open Library](https://openlibrary.org). Está hecha con React + Vite y no tiene
+servidor propio, base de datos ni proxy: el navegador consume la API directamente
+con `fetch`.
 
-# 1. Recurso
+## Características
 
-El recurso principal son los Libros. Todo el proyecto gira en torno a buscar y mostrar libros.
+- Búsqueda por título, autor o tema con **debounce** de 350 ms.
+- Cancelación de peticiones obsoletas con `AbortController`.
+- Filtros por categoría, idioma y año.
+- Orden por relevancia, año o título.
+- Paginación con el botón **Cargar más**.
+- Modal de detalle con enlace a la ficha de Open Library.
+- Favoritos guardados en `localStorage`.
+- Tema claro/oscuro persistente.
+- Estados de carga, sin resultados y error con reintento.
 
-# 2. Endpoints (CRUD)
+## Stack
 
-Las rutas que necesito para los libros son:
+| Herramienta | Uso |
+|---|---|
+| React 19 | Interfaz y estado |
+| Vite 8 | Servidor de desarrollo y build estático |
+| CSS puro | Estilos y variables de tema |
+| Oxlint | Lint |
+| Vitest + Testing Library | Tests |
 
-- **GET /api/libros** -> trae todos los libros
-- **GET /api/libros/:id** -> trae un libro por su id
-- **POST /api/libros** -> agrega un libro nuevo
-- **PUT /api/libros/:id** -> edita un libro (por ejemplo si me equivoque con el autor)
-- **DELETE /api/libros/:id** -> elimina un libro
+> Vite y Vitest son herramientas de desarrollo. La aplicación publicada es un
+> sitio estático: no hay backend en ningún momento.
 
-# 3. Ejemplo del JSON
+## Cómo correr el proyecto
 
-Si hago un GET a un libro me devuelve algo asi:
-
-```json
-{
-  "id": 1,
-  "titulo": "Steve Jobs",
-  "autor": "Walter Isaacson",
-  "categoria": "Biografia",
-  "anio": 2011,
-  "isbn": "12345",
-  "resumen": "La biografia de Steve Jobs..."
-}
+```bash
+cd proyecto-react
+npm install
+npm run dev
 ```
 
-# 4. Lenguaje de BackEnd
+Luego abre la URL que muestra Vite (normalmente `http://localhost:5173`).
 
-**Lenguaje:** Node.js con Express
+### Scripts
 
-**Por que lo elegí:**
-Lo elegi porque en la materia ya usamos JavaScript para el frontend entonces me parece lo mas logico seguir con el mismo lenguaje en el backend. Ademas con Express es bastante facil y rapido levantar un servidor, no hay que configurar mucho.
+| Comando | Descripción |
+|---|---|
+| `npm run dev` | Servidor de desarrollo con recarga en caliente. |
+| `npm run build` | Genera el sitio estático en `dist/`. |
+| `npm run preview` | Sirve el build de producción. |
+| `npm test` | Ejecuta los tests una vez. |
+| `npm run test:watch` | Tests en modo interactivo. |
+| `npm run lint` | Analiza el código con Oxlint. |
 
----
+## Estructura
 
-# 5. API publica usada
-
-**API:** Open Library  
-**URL:** https://openlibrary.org/search.json
-
-La use para traer los libros reales en vez de tener datos inventados. Es gratuita y no necesita clave ni registro.
-
-## Como la uso
-
-Para buscar libros mando un GET asi:
-
-```
-https://openlibrary.org/search.json?q=harry potter&limit=12
-```
-
-El `q` es el termino de busqueda y `limit` es cuantos resultados quiero.
-
-Para las portadas uso esta otra URL con el id de la portada que viene en la respuesta:
-
-```
-https://covers.openlibrary.org/b/id/8091016-M.jpg
-```
-
-## Ejemplo de lo que devuelve
-
-```json
-{
-  "key": "/works/OL45804W",
-  "title": "Clean Code",
-  "author_name": ["Robert C. Martin"],
-  "first_publish_year": 2008,
-  "cover_i": 8091016,
-  "isbn": ["9780132350884"],
-  "edition_count": 10
-}
+```text
+proyecto-react/
+├── src/
+│   ├── api/
+│   │   ├── normalizar.js      # doc de Open Library -> modelo único
+│   │   └── openLibrary.js     # armado de URL + fetch
+│   ├── components/            # Header, Hero, Filtros, BookCard, ...
+│   ├── hooks/
+│   │   ├── useBuscador.js     # debounce, filtros, orden y paginación
+│   │   ├── useFavoritos.js    # favoritos en localStorage
+│   │   └── useTema.js         # tema claro/oscuro
+│   ├── test/                  # setup y fixtures de pruebas
+│   ├── App.jsx
+│   └── index.css
+├── docs/ (en la raíz del repo)
+└── package.json
 ```
 
-## Como lo use en React
+## API usada
 
-En `App.jsx` hice el fetch dentro de un useEffect para que cargue los libros cuando abre la pagina:
-
-```js
-useEffect(() => {
-  fetch('https://openlibrary.org/search.json?q=programacion&limit=12')
-    .then(res => res.json())
-    .then(data => setDatos(data.docs))
-    .catch(err => setError('no se pudo conectar'))
-}, [busqueda])
+```text
+GET https://openlibrary.org/search.json?q=harry%20potter&limit=12&offset=0
 ```
 
----
+Parámetros opcionales que usa la app:
 
-# Practica U3-2 : Convertir el GET en una Lista en Pantalla
+- `subject`: categoría o tema.
+- `lang`: código de idioma (`spa`, `eng`, …).
+- `first_publish_year`: año de primera publicación.
 
-En esta practica teniamos que mostrar los datos de la API en pantalla usando React, ya no solo en la consola.
+Las portadas salen de:
 
-Lo que hice fue meter el fetch dentro de un useEffect en App.jsx. Use tres estados: uno para guardar los libros y  otro para saber si esta cargando y otro para el error. Mientras espera que lleguen los datos muestra un spinner y si falla la peticion sale un mensaje de error.
+```text
+https://covers.openlibrary.org/b/id/<cover_i>-M.jpg
+```
 
-Para mostrar los libros use .map() y le pase el key que viene del id de Open Library (doc.key). Modifique App.jsx para toda la logica y en index.css agregue los estilos del spinner y el bloque de error.
+No requiere clave ni registro. La API es de **solo lectura**.
+
+## Documentación de diseño
+
+- [Casos de uso y diagramas](docs/casos_de_uso.md)
+- [Guía de estilo](docs/guia_de_estilo.md)
+
+## Limitaciones conocidas
+
+- La app depende de la disponibilidad y de los límites de Open Library.
+- El ordenamiento se aplica sobre los resultados ya cargados, no sobre el total.
+- Los filtros por `subject` funcionan mejor con términos en inglés (los que usa
+  Open Library en sus datos).
+- Los favoritos viven solo en el navegador donde se guardaron.
+- La carpeta raíz del repositorio (`index.html`, `app.js`, `styles.css`) es la
+  primera maqueta estática de la materia; la aplicación final es la de
+  `proyecto-react/`.
