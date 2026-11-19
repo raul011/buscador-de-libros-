@@ -57,9 +57,8 @@ function ModalTipoLectura({ tipoActual, onSeleccionar, onCerrar }) {
               <button
                 key={opc.id}
                 type="button"
-                className={`modal-opcion-card modal-opcion-${opc.id} ${
-                  esActivo ? 'activa' : ''
-                }`}
+                className={`modal-opcion-card modal-opcion-${opc.id} ${esActivo ? 'activa' : ''
+                  }`}
                 onClick={() => onSeleccionar(opc.id)}
               >
                 <div className="opcion-icono-wrap">
