@@ -1,144 +1,180 @@
-import { useState, useEffect } from 'react'
+import { useCallback, useState } from 'react'
 import Header from './components/Header'
 import Hero from './components/Hero'
+import Filtros from './components/Filtros'
 import BookCard from './components/BookCard'
+import Paginacion from './components/Paginacion'
+import DetalleLibro from './components/DetalleLibro'
+import Favoritos from './components/Favoritos'
 import Footer from './components/Footer'
-
-// ─────────────────────────────────────────────
-//  URL de la API pública (Open Library)
-// ─────────────────────────────────────────────
-const API_BASE = 'https://openlibrary.org/search.json'
-
-// esta funcion toma un libro de la API y lo acomoda para usarlo en la tarjeta
-function formatearLibro(doc, index) {
-  return {
-    // id unico que viene de Open Library
-    id: doc.key || `libro-${index}`,
-    titulo: doc.title || 'Sin título',
-    autor: doc.author_name ? doc.author_name[0] : 'Autor desconocido',
-    anio: doc.first_publish_year || 'N/D',
-    categoria: doc.subject ? doc.subject[0] : 'General',
-    resumen: `Publicado en ${doc.first_publish_year || 'fecha desconocida'}. Ediciones disponibles: ${doc.edition_count || 1}.`,
-    isbn: doc.isbn ? doc.isbn[0] : 'N/D',
-    imagen: doc.cover_i
-      ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`
-      : 'https://placehold.co/200x280?text=Sin+Portada',
-    enlace: `https://openlibrary.org${doc.key}`,
-  }
-}
+import { useBuscador } from './hooks/useBuscador'
+import { useFavoritos } from './hooks/useFavoritos'
+import { useTema } from './hooks/useTema'
 
 function App() {
-  // Término de búsqueda ingresado por el usuario
-  const [busqueda, setBusqueda] = useState('')
+    const buscador = useBuscador()
+    const { favoritos, esFavorito, alternarFavorito } = useFavoritos()
+    const { tema, alternarTema } = useTema()
 
-  // ── PUNTO 2: los tres estados ──────────────────────────────────────
-  const [datos, setDatos] = useState([])       // datos: lista de libros
-  const [cargando, setCargando] = useState(false) // cargando: boolean
-  const [error, setError] = useState(null)     // error: string | null
-  // ──────────────────────────────────────────────────────────────────
+    const [vista, setVista] = useState('buscar')
+    const [seleccionado, setSeleccionado] = useState(null)
 
-  // ── PUNTO 1: fetch dentro de useEffect ────────────────────────────
-  useEffect(() => {
-    // Construimos la URL según si hay búsqueda o no
-    const termino = busqueda.trim()
-    const url = termino
-      ? `${API_BASE}?q=${encodeURIComponent(termino)}&limit=12`
-      : `${API_BASE}?q=programacion&limit=12`
+    const irAInicio = useCallback(() => {
+        setSeleccionado(null)
+        setVista('buscar')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, [])
 
-    // Activamos el estado de carga y limpiamos errores anteriores
-    setCargando(true)
-    setError(null)
+    const abrirFavoritos = useCallback(() => {
+        setSeleccionado(null)
+        setVista('favoritos')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, [])
 
-    fetch(url)
-      .then((res) => {
-        // Verificamos que la respuesta sea exitosa
-        if (!res.ok) {
-          throw new Error(`Error HTTP: ${res.status}`)
-        }
-        return res.json()
-      })
-      .then((data) => {
-        // PUNTO 1 → datos recibidos: guardamos en estado
-        const librosFormateados = data.docs.map(formatearLibro)
-        setDatos(librosFormateados)
-        setCargando(false)
-      })
-      .catch((err) => {
-        // PUNTO 2 → estado de error
-        console.error('Error en fetch:', err)
-        setError('No se pudo conectar con Open Library. Verifica tu conexión e intenta de nuevo.')
-        setCargando(false)
-      })
-  }, [busqueda]) // se vuelve a ejecutar cada vez que cambia busqueda
-  // ──────────────────────────────────────────────────────────────────
+    const volverABuscar = useCallback(() => {
+        setVista('buscar')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, [])
 
-  // Mensaje de resultados para el Hero
-  const termino = busqueda.trim()
-  let mensaje = ''
-  if (termino && !cargando) {
-    mensaje = datos.length > 0
-      ? `${datos.length} resultado(s) para "${termino}"`
-      : `No se encontraron libros para "${termino}"`
-  }
+    const hayFiltrosActivos =
+        buscador.hayFiltros ||
+        buscador.orden !== 'relevancia' ||
+        Boolean(buscador.terminoAplicado)
 
-  return (
-    <>
-      <Header />
+    return (
+        <>
+            <Header
+                tema={tema}
+                cantidadFavoritos={favoritos.length}
+                onIrInicio={irAInicio}
+                onVerFavoritos={abrirFavoritos}
+                onAlternarTema={alternarTema}
+            />
 
-      <main>
-        <Hero onBuscar={setBusqueda} mensaje={mensaje} />
+            <main>
+                {vista === 'buscar' ? (
+                    <>
+                        <Hero
+                            texto={buscador.texto}
+                            mensaje={buscador.mensaje}
+                            onCambiarTexto={buscador.cambiarTexto}
+                            onBuscar={buscador.buscarAhora}
+                        />
 
-        <section className="books-section">
-          <h3 className="titulo-seccion">
-            {termino ? `Resultados para "${termino}"` : 'Libros Destacados'}
-          </h3>
+                        <section
+                            className="books-section"
+                            id="libros"
+                            aria-labelledby="titulo-libros"
+                        >
+                            <h3 className="titulo-seccion" id="titulo-libros">
+                                {buscador.terminoAplicado
+                                    ? `Resultados para "${buscador.terminoAplicado}"`
+                                    : 'Libros destacados'}
+                            </h3>
 
-          {/* ── PUNTO 4: Mostrar "Cargando..." ── */}
-          {cargando && (
-            <div className="estado-carga">
-              <div className="spinner"></div>
-              <p>Cargando libros desde Open Library...</p>
-            </div>
-          )}
+                            <Filtros
+                                key={`${buscador.criterios.categoria}|${buscador.criterios.idioma}|${buscador.criterios.anio}`}
+                                categoria={buscador.criterios.categoria}
+                                idioma={buscador.criterios.idioma}
+                                anio={buscador.criterios.anio}
+                                orden={buscador.orden}
+                                onAplicar={buscador.aplicarFiltros}
+                                onCambiarOrden={buscador.cambiarOrden}
+                                onLimpiar={buscador.limpiar}
+                                hayFiltros={hayFiltrosActivos}
+                            />
 
-          {/* ── PUNTO 4: Mensaje de error amigable ── */}
-          {error && !cargando && (
-            <div className="estado-error">
-              <span className="error-icono">📚</span>
-              <p className="error-titulo">Algo salió mal</p>
-              <p className="error-detalle">{error}</p>
-              <button
-                className="btn-reintentar"
-                onClick={() => setBusqueda((prev) => prev + ' ')}
-              >
-                Reintentar
-              </button>
-            </div>
-          )}
+                            {buscador.cargando && buscador.libros.length === 0 && (
+                                <div className="estado-carga">
+                                    <div className="spinner" aria-hidden="true"></div>
+                                    <p>Cargando libros desde Open Library…</p>
+                                </div>
+                            )}
 
-          {/* ── PUNTO 3: Renderizar lista con .map() y key único ── */}
-          {!cargando && !error && datos.length > 0 && (
-            <div className="books-grid">
-              {datos.map((libro) => (
-                // key={libro.id} → id único de Open Library (doc.key)
-                <BookCard key={libro.id} libro={libro} />
-              ))}
-            </div>
-          )}
+                            {buscador.error && (
+                                <div className="estado-error" role="alert">
+                                    <p className="error-titulo">Algo salió mal</p>
+                                    <p className="error-detalle">{buscador.error}</p>
+                                    <button
+                                        type="button"
+                                        className="boton-primario"
+                                        onClick={buscador.reintentar}
+                                    >
+                                        Reintentar
+                                    </button>
+                                </div>
+                            )}
 
-          {/* Sin resultados */}
-          {!cargando && !error && termino && datos.length === 0 && (
-            <div className="estado-vacio">
-              <p>🔍 No se encontraron libros para <strong>"{termino}"</strong>.</p>
-              <p>Intenta con otro título o autor.</p>
-            </div>
-          )}
-        </section>
-      </main>
+                            {buscador.libros.length > 0 && (
+                                <>
+                                    <div className="books-grid">
+                                        {buscador.libros.map((libro) => (
+                                            <BookCard
+                                                key={libro.id}
+                                                libro={libro}
+                                                esFavorito={esFavorito(libro.id)}
+                                                onVerDetalles={setSeleccionado}
+                                                onAlternarFavorito={alternarFavorito}
+                                            />
+                                        ))}
+                                    </div>
 
-      <Footer />
-    </>
-  )
+                                    {!buscador.error && (
+                                        <Paginacion
+                                            cargados={buscador.libros.length}
+                                            total={buscador.total}
+                                            hayMas={buscador.hayMas}
+                                            cargando={buscador.cargandoMas}
+                                            onCargarMas={buscador.cargarMas}
+                                        />
+                                    )}
+                                </>
+                            )}
+
+                            {!buscador.cargando &&
+                                !buscador.error &&
+                                buscador.libros.length === 0 && (
+                                    <div className="estado-vacio">
+                                        <p>
+                                            {buscador.terminoAplicado
+                                                ? `No se encontraron libros para "${buscador.terminoAplicado}".`
+                                                : 'No se encontraron libros.'}
+                                        </p>
+                                        <p>Intenta con otro título, autor o quitando filtros.</p>
+                                        <button
+                                            type="button"
+                                            className="boton-primario"
+                                            onClick={buscador.limpiar}
+                                        >
+                                            Limpiar búsqueda y filtros
+                                        </button>
+                                    </div>
+                                )}
+                        </section>
+                    </>
+                ) : (
+                    <Favoritos
+                        favoritos={favoritos}
+                        esFavorito={esFavorito}
+                        onVerDetalles={setSeleccionado}
+                        onAlternarFavorito={alternarFavorito}
+                        onVolver={volverABuscar}
+                    />
+                )}
+            </main>
+
+            <Footer />
+
+            {seleccionado && (
+                <DetalleLibro
+                    libro={seleccionado}
+                    esFavorito={esFavorito(seleccionado.id)}
+                    onCerrar={() => setSeleccionado(null)}
+                    onAlternarFavorito={alternarFavorito}
+                />
+            )}
+        </>
+    )
 }
 
 export default App
