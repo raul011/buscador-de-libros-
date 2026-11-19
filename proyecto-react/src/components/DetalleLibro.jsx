@@ -1,8 +1,48 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { PORTADA_PLACEHOLDER } from '../api/normalizar'
 
 function DetalleLibro({ libro, esFavorito, onCerrar, onAlternarFavorito }) {
     const cerrarRef = useRef(null)
+    const [descripcionApi, setDescripcionApi] = useState(null)
+    const [cargandoDesc, setCargandoDesc] = useState(false)
+
+    // Consultamos la descripción completa de la obra desde la API de Open Library
+    useEffect(() => {
+        if (!libro?.id || !String(libro.id).startsWith('/works/')) return
+
+        let cancelado = false
+
+        fetch(`https://openlibrary.org${libro.id}.json`)
+            .then((res) => {
+                if (!res.ok) throw new Error('HTTP ' + res.status)
+                return res.json()
+            })
+            .then((data) => {
+                if (cancelado || !data) return
+                let texto = null
+                if (typeof data.description === 'string') {
+                    texto = data.description
+                } else if (data.description && typeof data.description.value === 'string') {
+                    texto = data.description.value
+                }
+                if (texto) {
+                    setDescripcionApi(texto)
+                }
+            })
+            .catch(() => {
+                // Si la obra no tiene descripción extendida o falla la red,
+                // se utiliza la descripción o resumen inicial del libro
+            })
+            .finally(() => {
+                if (!cancelado) {
+                    setCargandoDesc(false)
+                }
+            })
+
+        return () => {
+            cancelado = true
+        }
+    }, [libro?.id])
 
     useEffect(() => {
         const previamenteEnfocado = document.activeElement
@@ -28,6 +68,8 @@ function DetalleLibro({ libro, esFavorito, onCerrar, onAlternarFavorito }) {
         }
     }
 
+    const textoDescripcion = descripcionApi || libro.descripcion || libro.resumen
+
     return (
         <div className="modal-fondo" role="presentation" onClick={onCerrar}>
             <div
@@ -44,38 +86,50 @@ function DetalleLibro({ libro, esFavorito, onCerrar, onAlternarFavorito }) {
                     onClick={onCerrar}
                     aria-label="Cerrar detalle"
                 >
-                    ×
+                    ✕
                 </button>
 
-                <img
-                    className="modal-portada"
-                    src={libro.imagen}
-                    alt={`Portada de ${libro.titulo}`}
-                    onError={alFallarImagen}
-                />
+                <div className="modal-portada-wrap">
+                    <img
+                        className="modal-portada"
+                        src={libro.imagen}
+                        alt={`Portada de ${libro.titulo}`}
+                        onError={alFallarImagen}
+                    />
+                </div>
 
                 <div className="modal-contenido">
-                    <span className="categoria">{libro.categoria}</span>
-                    <h3 id="detalle-titulo">{libro.titulo}</h3>
-                    <p className="nombre-autor">{libro.autor}</p>
+                    <h3 id="detalle-titulo" className="modal-titulo">
+                        {libro.titulo}
+                    </h3>
+                    <p className="modal-autor">{libro.autor}</p>
 
-                    <dl className="modal-datos">
-                        <div>
-                            <dt>Año</dt>
-                            <dd>{libro.anio}</dd>
+                    <div className="modal-datos-grid">
+                        <div className="modal-dato-item">
+                            <span className="modal-dato-label">AÑO</span>
+                            <span className="modal-dato-valor">{libro.anio}</span>
                         </div>
-                        <div>
-                            <dt>ISBN</dt>
-                            <dd>{libro.isbn}</dd>
+                        <div className="modal-dato-item">
+                            <span className="modal-dato-label">ISBN</span>
+                            <span className="modal-dato-valor">{libro.isbn}</span>
                         </div>
-                    </dl>
+                    </div>
 
-                    <p className="resumen">{libro.resumen}</p>
+                    <div className="modal-descripcion-caja">
+                        <p className="modal-descripcion-texto">
+                            {textoDescripcion}
+                        </p>
+                        {cargandoDesc && (
+                            <span className="cargando-desc-aviso">
+                                Consultando sinopsis detallada…
+                            </span>
+                        )}
+                    </div>
 
                     <div className="modal-acciones">
                         <button
                             type="button"
-                            className="boton-favorito"
+                            className="boton-modal-favorito boton-favorito"
                             aria-pressed={esFavorito}
                             onClick={() => onAlternarFavorito(libro)}
                         >
@@ -84,7 +138,7 @@ function DetalleLibro({ libro, esFavorito, onCerrar, onAlternarFavorito }) {
 
                         {libro.enlace && (
                             <a
-                                className="boton-enlace"
+                                className="boton-modal-enlace boton-enlace"
                                 href={libro.enlace}
                                 target="_blank"
                                 rel="noopener noreferrer"

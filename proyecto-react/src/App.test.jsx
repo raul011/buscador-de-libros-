@@ -118,20 +118,32 @@ describe('App', () => {
         await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     })
 
-    it('cambia el tema y lo persiste', async () => {
+    it('cambia entre los temas infantil, juvenil y adultos y lo persiste', async () => {
         const usuario = userEvent.setup()
         fetchMock.mockResolvedValue(respuestaOk(crearDocs(1)))
 
         render(<App />)
         await screen.findByText('Libro 1')
 
-        await usuario.click(screen.getByRole('button', { name: 'Activar modo oscuro' }))
+        // Estado inicial: infantil
+        expect(document.documentElement).toHaveAttribute('data-tema', 'infantil')
 
-        expect(document.documentElement).toHaveAttribute('data-tema', 'oscuro')
-        expect(localStorage.getItem('buscador-libros:tema')).toBe('oscuro')
-        expect(
-            screen.getByRole('button', { name: 'Activar modo claro' }),
-        ).toBeInTheDocument()
+        // 1er clic: cambia a modo juvenil
+        await usuario.click(screen.getByRole('button', { name: 'Cambiar a modo juvenil' }))
+        expect(document.documentElement).toHaveAttribute('data-tema', 'juvenil')
+        expect(localStorage.getItem('buscador-libros:tema')).toBe('juvenil')
+        expect(screen.getByRole('button', { name: 'Cambiar a modo adultos' })).toBeInTheDocument()
+
+        // 2do clic: cambia a modo adultos
+        await usuario.click(screen.getByRole('button', { name: 'Cambiar a modo adultos' }))
+        expect(document.documentElement).toHaveAttribute('data-tema', 'adultos')
+        expect(localStorage.getItem('buscador-libros:tema')).toBe('adultos')
+        expect(screen.getByRole('button', { name: 'Cambiar a modo infantil' })).toBeInTheDocument()
+
+        // 3er clic: vuelve a modo infantil
+        await usuario.click(screen.getByRole('button', { name: 'Cambiar a modo infantil' }))
+        expect(document.documentElement).toHaveAttribute('data-tema', 'infantil')
+        expect(localStorage.getItem('buscador-libros:tema')).toBe('infantil')
     })
 
     it('carga más resultados sin borrar los anteriores', async () => {

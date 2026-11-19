@@ -23,15 +23,29 @@ export function normalizarLibro(doc = {}, indice = 0) {
 
     const isbn = Array.isArray(doc.isbn) && esTexto(doc.isbn[0]) ? doc.isbn[0] : 'N/D'
 
+    let descripcion = ''
+    if (esTexto(doc.description)) {
+        descripcion = doc.description
+    } else if (doc.description && esTexto(doc.description.value)) {
+        descripcion = doc.description.value
+    } else if (Array.isArray(doc.first_sentence) && esTexto(doc.first_sentence[0])) {
+        descripcion = doc.first_sentence[0]
+    } else if (esTexto(doc.first_sentence)) {
+        descripcion = doc.first_sentence
+    }
+
+    const resumen = esNumero(doc.first_publish_year)
+        ? `Publicado en ${doc.first_publish_year}. Ediciones disponibles: ${ediciones}.`
+        : `Ediciones disponibles: ${ediciones}.`
+
     return {
         id: clave,
         titulo: esTexto(doc.title) ? doc.title : 'Sin título',
         autor,
         anio,
         categoria,
-        resumen: esNumero(doc.first_publish_year)
-            ? `Publicado en ${doc.first_publish_year}. Ediciones disponibles: ${ediciones}.`
-            : `Ediciones disponibles: ${ediciones}.`,
+        resumen,
+        descripcion: descripcion || resumen,
         isbn,
         imagen: esNumero(doc.cover_i)
             ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg`

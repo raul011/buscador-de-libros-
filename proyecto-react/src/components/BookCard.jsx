@@ -1,7 +1,7 @@
 import { PORTADA_PLACEHOLDER } from '../api/normalizar'
 
 function BookCard({ libro, esFavorito, onVerDetalles, onAlternarFavorito }) {
-    const { imagen, categoria, anio, titulo, autor, resumen, isbn } = libro
+    const { imagen, titulo, autor } = libro
 
     const alFallarImagen = (evento) => {
         if (evento.currentTarget.src !== PORTADA_PLACEHOLDER) {
@@ -11,25 +11,28 @@ function BookCard({ libro, esFavorito, onVerDetalles, onAlternarFavorito }) {
 
     return (
         <article className="book-card">
-            <img
-                src={imagen}
-                alt={`Portada de ${titulo}`}
-                loading="lazy"
-                onError={alFallarImagen}
-            />
-            <div className="book-info">
-                <div className="datos-extra">
-                    <span className="categoria">{categoria}</span>
-                    <span className="anio-pub">{anio}</span>
-                </div>
+            <div className="card-portada-contenedor">
+                <img
+                    src={imagen}
+                    alt={`Portada de ${titulo}`}
+                    loading="lazy"
+                    onError={alFallarImagen}
+                />
+            </div>
 
+            <div className="book-info">
                 <h4 title={titulo}>{titulo}</h4>
                 <p className="nombre-autor">{autor}</p>
-                <p className="resumen">{resumen}</p>
 
                 <div className="book-footer">
-                    <span className="codigo-isbn">ISBN: {isbn}</span>
                     <div className="acciones-tarjeta">
+                        <button
+                            type="button"
+                            className="boton-detalles"
+                            onClick={() => onVerDetalles(libro)}
+                        >
+                            Detalles
+                        </button>
                         <button
                             type="button"
                             className="boton-corazon"
@@ -41,14 +44,20 @@ function BookCard({ libro, esFavorito, onVerDetalles, onAlternarFavorito }) {
                             }
                             onClick={() => onAlternarFavorito(libro)}
                         >
-                            {esFavorito ? '♥' : '♡'}
-                        </button>
-                        <button
-                            type="button"
-                            className="boton-detalles"
-                            onClick={() => onVerDetalles(libro)}
-                        >
-                            Detalles
+                            <svg
+                                className="icono-corazon"
+                                width="22"
+                                height="22"
+                                viewBox="0 0 24 24"
+                                fill={esFavorito ? 'currentColor' : 'none'}
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                            </svg>
                         </button>
                     </div>
                 </div>

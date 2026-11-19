@@ -5,6 +5,18 @@ function Header({
     onVerFavoritos,
     onAlternarTema,
 }) {
+    const nombreTema = () => {
+        if (tema === 'juvenil') return 'Juvenil'
+        if (tema === 'adultos') return 'Adultos'
+        return 'Infantil'
+    }
+
+    const obtenerAriaLabel = () => {
+        if (tema === 'infantil') return 'Cambiar a modo juvenil'
+        if (tema === 'juvenil') return 'Cambiar a modo adultos'
+        return 'Cambiar a modo infantil'
+    }
+
     return (
         <header className="main-header" id="inicio">
             <div className="logo">
@@ -27,11 +39,25 @@ function Header({
                             type="button"
                             className="boton-tema"
                             onClick={onAlternarTema}
-                            aria-label={
-                                tema === 'oscuro' ? 'Activar modo claro' : 'Activar modo oscuro'
-                            }
+                            aria-label={obtenerAriaLabel()}
+                            title="Alternar entre temas: Infantil → Juvenil → Adultos"
                         >
-                            {tema === 'oscuro' ? 'Modo claro' : 'Modo oscuro'}
+                            <svg
+                                className="icono-usuario"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
+                            >
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                            <span>{nombreTema()}</span>
                         </button>
                     </li>
                 </ul>
