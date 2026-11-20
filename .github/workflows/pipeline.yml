@@ -72,7 +72,7 @@ jobs:
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          password: ${{ secrets.FTP_PASS }}
           # Sube el contenido de dist/ al subdirectorio del grupo
           local-dir: ./proyecto-react/dist/
           server-dir: /inf240/grupo04sx/
