@@ -1,4 +1,4 @@
-name: CI / Deploy a Tecnoweb
+name: CI / CD Despliegue proyecto integrador
 
 # Se ejecuta en cada push a main
 on:
