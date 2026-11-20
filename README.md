@@ -100,3 +100,13 @@ En esta practica teniamos que mostrar los datos de la API en pantalla usando Rea
 Lo que hice fue meter el fetch dentro de un useEffect en App.jsx. Use tres estados: uno para guardar los libros y  otro para saber si esta cargando y otro para el error. Mientras espera que lleguen los datos muestra un spinner y si falla la peticion sale un mensaje de error.
 
 Para mostrar los libros use .map() y le pase el key que viene del id de Open Library (doc.key). Modifique App.jsx para toda la logica y en index.css agregue los estilos del spinner y el bloque de error.
+
+---
+
+# Practica U3-3 : Estado compartido con Context API
+
+El estado de **favoritos** lo usan varios componentes (`Header`, `BookCard`, `Favoritos` y `DetalleLibro`). Para eliminar el prop drilling, lo movi a un `FavoritosProvider` (`proyecto-react/src/context/FavoritosProvider.jsx`) y cada componente lo lee con el hook `useFavoritosContext()` (`proyecto-react/src/context/FavoritosContext.js`).
+
+Elegí **Context API** y no Redux Toolkit porque el estado es pequeño, local y no necesita middleware ni devtools. El provider mantiene la persistencia en `localStorage` y expone `favoritos`, `esFavorito` y `alternarFavorito`.
+
+Así el contador del header, los corazones de las tarjetas, la vista de favoritos y el botón del modal se actualizan al mismo tiempo desde un único origen.

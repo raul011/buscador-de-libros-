@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { PORTADA_PLACEHOLDER } from '../api/normalizar'
+import { useFavoritosContext } from '../context/FavoritosContext'
 
-function DetalleLibro({ libro, esFavorito, onCerrar, onAlternarFavorito }) {
+function DetalleLibro({ libro, onCerrar }) {
+    const { esFavorito, alternarFavorito } = useFavoritosContext()
+    const esFavoritoActual = esFavorito(libro.id)
     const cerrarRef = useRef(null)
 
     useEffect(() => {
@@ -76,10 +79,10 @@ function DetalleLibro({ libro, esFavorito, onCerrar, onAlternarFavorito }) {
                         <button
                             type="button"
                             className="boton-favorito"
-                            aria-pressed={esFavorito}
-                            onClick={() => onAlternarFavorito(libro)}
+                            aria-pressed={esFavoritoActual}
+                            onClick={() => alternarFavorito(libro)}
                         >
-                            {esFavorito ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                            {esFavoritoActual ? 'Quitar de favoritos' : 'Agregar a favoritos'}
                         </button>
 
                         {libro.enlace && (

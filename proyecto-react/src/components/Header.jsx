@@ -1,10 +1,8 @@
-function Header({
-    tema,
-    cantidadFavoritos,
-    onIrInicio,
-    onVerFavoritos,
-    onAlternarTema,
-}) {
+import { useFavoritosContext } from '../context/FavoritosContext'
+
+function Header({ tema, onIrInicio, onVerFavoritos, onAlternarTema }) {
+    const { favoritos } = useFavoritosContext()
+
     return (
         <header className="main-header" id="inicio">
             <div className="logo">
@@ -19,7 +17,7 @@ function Header({
                     </li>
                     <li>
                         <button type="button" className="nav-boton" onClick={onVerFavoritos}>
-                            Favoritos ({cantidadFavoritos})
+                            Favoritos ({favoritos.length})
                         </button>
                     </li>
                     <li>

@@ -1,6 +1,9 @@
 import BookCard from './BookCard'
+import { useFavoritosContext } from '../context/FavoritosContext'
 
-function Favoritos({ favoritos, esFavorito, onVerDetalles, onAlternarFavorito, onVolver }) {
+function Favoritos({ onVerDetalles, onVolver }) {
+    const { favoritos } = useFavoritosContext()
+
     return (
         <section className="books-section" aria-labelledby="titulo-favoritos">
             <h3 className="titulo-seccion" id="titulo-favoritos">
@@ -20,9 +23,7 @@ function Favoritos({ favoritos, esFavorito, onVerDetalles, onAlternarFavorito, o
                         <BookCard
                             key={libro.id}
                             libro={libro}
-                            esFavorito={esFavorito(libro.id)}
                             onVerDetalles={onVerDetalles}
-                            onAlternarFavorito={onAlternarFavorito}
                         />
                     ))}
                 </div>

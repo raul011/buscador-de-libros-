@@ -8,12 +8,11 @@ import DetalleLibro from './components/DetalleLibro'
 import Favoritos from './components/Favoritos'
 import Footer from './components/Footer'
 import { useBuscador } from './hooks/useBuscador'
-import { useFavoritos } from './hooks/useFavoritos'
 import { useTema } from './hooks/useTema'
+import { FavoritosProvider } from './context/FavoritosProvider'
 
-function App() {
+function AppContenido() {
     const buscador = useBuscador()
-    const { favoritos, esFavorito, alternarFavorito } = useFavoritos()
     const { tema, alternarTema } = useTema()
 
     const [vista, setVista] = useState('buscar')
@@ -45,7 +44,6 @@ function App() {
         <>
             <Header
                 tema={tema}
-                cantidadFavoritos={favoritos.length}
                 onIrInicio={irAInicio}
                 onVerFavoritos={abrirFavoritos}
                 onAlternarTema={alternarTema}
@@ -112,9 +110,7 @@ function App() {
                                             <BookCard
                                                 key={libro.id}
                                                 libro={libro}
-                                                esFavorito={esFavorito(libro.id)}
                                                 onVerDetalles={setSeleccionado}
-                                                onAlternarFavorito={alternarFavorito}
                                             />
                                         ))}
                                     </div>
@@ -154,10 +150,7 @@ function App() {
                     </>
                 ) : (
                     <Favoritos
-                        favoritos={favoritos}
-                        esFavorito={esFavorito}
                         onVerDetalles={setSeleccionado}
-                        onAlternarFavorito={alternarFavorito}
                         onVolver={volverABuscar}
                     />
                 )}
@@ -168,12 +161,18 @@ function App() {
             {seleccionado && (
                 <DetalleLibro
                     libro={seleccionado}
-                    esFavorito={esFavorito(seleccionado.id)}
                     onCerrar={() => setSeleccionado(null)}
-                    onAlternarFavorito={alternarFavorito}
                 />
             )}
         </>
+    )
+}
+
+function App() {
+    return (
+        <FavoritosProvider>
+            <AppContenido />
+        </FavoritosProvider>
     )
 }
 

@@ -1,7 +1,10 @@
 import { PORTADA_PLACEHOLDER } from '../api/normalizar'
+import { useFavoritosContext } from '../context/FavoritosContext'
 
-function BookCard({ libro, esFavorito, onVerDetalles, onAlternarFavorito }) {
+function BookCard({ libro, onVerDetalles }) {
+    const { esFavorito, alternarFavorito } = useFavoritosContext()
     const { imagen, categoria, anio, titulo, autor, resumen, isbn } = libro
+    const esFavoritoActual = esFavorito(libro.id)
 
     const alFallarImagen = (evento) => {
         if (evento.currentTarget.src !== PORTADA_PLACEHOLDER) {
@@ -33,15 +36,15 @@ function BookCard({ libro, esFavorito, onVerDetalles, onAlternarFavorito }) {
                         <button
                             type="button"
                             className="boton-corazon"
-                            aria-pressed={esFavorito}
+                            aria-pressed={esFavoritoActual}
                             aria-label={
-                                esFavorito
+                                esFavoritoActual
                                     ? `Quitar ${titulo} de favoritos`
                                     : `Agregar ${titulo} a favoritos`
                             }
-                            onClick={() => onAlternarFavorito(libro)}
+                            onClick={() => alternarFavorito(libro)}
                         >
-                            {esFavorito ? '♥' : '♡'}
+                            {esFavoritoActual ? '♥' : '♡'}
                         </button>
                         <button
                             type="button"

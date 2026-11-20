@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { FavoritosContext } from './FavoritosContext'
 
 const CLAVE = 'buscador-libros:favoritos'
 
@@ -13,7 +14,7 @@ function leerFavoritos() {
     }
 }
 
-export function useFavoritos() {
+export function FavoritosProvider({ children }) {
     const [favoritos, setFavoritos] = useState(leerFavoritos)
 
     useEffect(() => {
@@ -40,5 +41,9 @@ export function useFavoritos() {
         })
     }, [])
 
-    return { favoritos, esFavorito, alternarFavorito }
+    return (
+        <FavoritosContext.Provider value={{ favoritos, esFavorito, alternarFavorito }}>
+            {children}
+        </FavoritosContext.Provider>
+    )
 }
