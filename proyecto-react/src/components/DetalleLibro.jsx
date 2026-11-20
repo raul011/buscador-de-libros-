@@ -1,10 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { PORTADA_PLACEHOLDER } from '../api/normalizar'
+import { useFavoritos } from '../hooks/useFavoritos'
 
-function DetalleLibro({ libro, esFavorito, onCerrar, onAlternarFavorito }) {
+function DetalleLibro({ libro, esFavorito: propEsFavorito, onCerrar, onAlternarFavorito: propAlternar }) {
     const cerrarRef = useRef(null)
     const [descripcionApi, setDescripcionApi] = useState(null)
     const [cargandoDesc, setCargandoDesc] = useState(false)
+
+    // Leemos el estado de favoritos directamente desde Context API
+    const { esFavorito: contextEsFavorito, alternarFavorito: contextAlternar } = useFavoritos()
+    const esFavorito = propEsFavorito !== undefined ? propEsFavorito : contextEsFavorito(libro?.id)
+    const onAlternarFavorito = propAlternar || contextAlternar
 
     // Consultamos la descripción completa de la obra desde la API de Open Library
     useEffect(() => {

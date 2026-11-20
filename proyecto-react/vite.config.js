@@ -3,6 +3,8 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // base apunta al subdirectorio del grupo en tecnoweb
+  base: '/inf240/grupo04sx/',
   plugins: [react()],
   test: {
     environment: 'jsdom',

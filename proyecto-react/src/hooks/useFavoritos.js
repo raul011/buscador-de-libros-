@@ -1,38 +1,46 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useContext, useState, useEffect, useCallback } from 'react'
+import { FavoritosContext } from '../context/favoritosContextInstance'
 
 const CLAVE = 'buscador-libros:favoritos'
 
-function leerFavoritos() {
+function leerFavoritosInicial() {
     try {
         const guardado = localStorage.getItem(CLAVE)
         const datos = JSON.parse(guardado)
         return Array.isArray(datos) ? datos : []
     } catch {
-        // si localStorage no está disponible, arrancamos sin favoritos
         return []
     }
 }
 
+/**
+ * Hook para gestionar los favoritos en cualquier componente.
+ * Si se encuentra dentro de <FavoritosProvider>, consume el Context API compartido.
+ * De lo contrario, mantiene su propio estado local reactivo como respaldo.
+ */
 export function useFavoritos() {
-    const [favoritos, setFavoritos] = useState(leerFavoritos)
+    const context = useContext(FavoritosContext)
+    const [favoritosLocal, setFavoritosLocal] = useState(leerFavoritosInicial)
 
     useEffect(() => {
-        try {
-            localStorage.setItem(CLAVE, JSON.stringify(favoritos))
-        } catch {
-            // si el navegador bloquea localStorage, los favoritos viven solo en memoria
+        if (!context) {
+            try {
+                localStorage.setItem(CLAVE, JSON.stringify(favoritosLocal))
+            } catch {
+                // sin persistencia
+            }
         }
-    }, [favoritos])
+    }, [context, favoritosLocal])
 
-    const esFavorito = useCallback(
-        (id) => favoritos.some((libro) => libro.id === id),
-        [favoritos],
+    const esFavoritoLocal = useCallback(
+        (id) => favoritosLocal.some((libro) => libro.id === id),
+        [favoritosLocal],
     )
 
-    const alternarFavorito = useCallback((libro) => {
+    const alternarFavoritoLocal = useCallback((libro) => {
         if (!libro?.id) return
 
-        setFavoritos((anteriores) => {
+        setFavoritosLocal((anteriores) => {
             const existe = anteriores.some((guardado) => guardado.id === libro.id)
             return existe
                 ? anteriores.filter((guardado) => guardado.id !== libro.id)
@@ -40,5 +48,14 @@ export function useFavoritos() {
         })
     }, [])
 
-    return { favoritos, esFavorito, alternarFavorito }
+    if (context) {
+        return context
+    }
+
+    return {
+        favoritos: favoritosLocal,
+        cantidadFavoritos: favoritosLocal.length,
+        esFavorito: esFavoritoLocal,
+        alternarFavorito: alternarFavoritoLocal,
+    }
 }

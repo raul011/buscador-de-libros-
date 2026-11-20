@@ -1,6 +1,12 @@
 import { PORTADA_PLACEHOLDER } from '../api/normalizar'
+import { useFavoritos } from '../hooks/useFavoritos'
 
-function BookCard({ libro, esFavorito, onVerDetalles, onAlternarFavorito }) {
+function BookCard({ libro, esFavorito: propEsFavorito, onVerDetalles, onAlternarFavorito: propAlternar }) {
+    // Leemos el estado de favoritos directamente del Context para eliminar prop drilling
+    const { esFavorito: contextEsFavorito, alternarFavorito: contextAlternar } = useFavoritos()
+
+    const esFavorito = propEsFavorito !== undefined ? propEsFavorito : contextEsFavorito(libro.id)
+    const onAlternarFavorito = propAlternar || contextAlternar
     const { imagen, titulo, autor } = libro
 
     const alFallarImagen = (evento) => {

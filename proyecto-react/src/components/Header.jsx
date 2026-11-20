@@ -1,10 +1,21 @@
+import { useTema } from '../hooks/useTema'
+import { useFavoritos } from '../hooks/useFavoritos'
+
 function Header({
-    tema,
-    cantidadFavoritos,
+    tema: propTema,
+    cantidadFavoritos: propCantidad,
     onIrInicio,
     onVerFavoritos,
-    onAlternarTema,
+    onAlternarTema: propAlternar,
 }) {
+    // Leemos el tema y favoritos directamente desde Context API para eliminar el prop drilling
+    const { tema: contextTema, alternarTema: contextAlternar } = useTema()
+    const { cantidadFavoritos: contextCantidad } = useFavoritos()
+
+    const tema = propTema !== undefined ? propTema : contextTema
+    const onAlternarTema = propAlternar || contextAlternar
+    const cantidadFavoritos = propCantidad !== undefined ? propCantidad : contextCantidad
+
     const nombreTema = () => {
         if (tema === 'juvenil') return 'Juvenil'
         if (tema === 'adultos') return 'Adultos'

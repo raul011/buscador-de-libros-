@@ -1,6 +1,11 @@
+import { useFavoritos } from '../hooks/useFavoritos'
 import BookCard from './BookCard'
 
-function Favoritos({ favoritos, esFavorito, onVerDetalles, onAlternarFavorito, onVolver }) {
+function Favoritos({ favoritos: propFavoritos, onVerDetalles, onVolver }) {
+    // Leemos la lista de favoritos directamente del Context API
+    const { favoritos: contextFavoritos } = useFavoritos()
+    const favoritos = propFavoritos || contextFavoritos
+
     return (
         <section className="books-section" aria-labelledby="titulo-favoritos">
             <h3 className="titulo-seccion" id="titulo-favoritos">
@@ -20,9 +25,7 @@ function Favoritos({ favoritos, esFavorito, onVerDetalles, onAlternarFavorito, o
                         <BookCard
                             key={libro.id}
                             libro={libro}
-                            esFavorito={esFavorito(libro.id)}
                             onVerDetalles={onVerDetalles}
-                            onAlternarFavorito={onAlternarFavorito}
                         />
                     ))}
                 </div>
