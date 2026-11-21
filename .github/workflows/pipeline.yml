@@ -75,7 +75,7 @@ jobs:
           password: ${{ secrets.FTP_PASS }}
           # Sube el contenido de dist/ al subdirectorio del grupo
           local-dir: ./proyecto-react/dist/
-          server-dir: /exposicion-prueba/
+          server-dir: /proyectofinal/
           # Borra archivos viejos del servidor que ya no existen en dist/
           dangerous-clean-slate: false
     ###
